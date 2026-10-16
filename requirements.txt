@@ -1,0 +1,15 @@
+# 微信群机器人依赖
+#
+# 安装：
+#   pip install -r requirements.txt
+# 或者跑自检（会顺便检查微信版本）：
+#   python check_env.py --install
+
+# --- 必需 ---
+uiautomation>=2.0.29     # Windows UI Automation 封装，Apache-2.0
+requests>=2.28.0         # AI 接口 / 后端 HTTP 调用
+
+# comtypes 由 uiautomation 自带，不用单独写
+
+# --- 可选：直连 MySQL 时才需要，不连库可以不装 ---
+pymysql>=1.0.0

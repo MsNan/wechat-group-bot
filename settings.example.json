@@ -1,0 +1,115 @@
+{
+  "_说明": [
+    "把这个文件复制成 settings.json，然后改。",
+    "这里写了什么就覆盖 config.py 里的什么，没写的沿用 config.py 的默认值。",
+    "打包成 exe 之后，settings.json 放在 exe 旁边，改完重启程序即可生效。",
+    "以下划线开头的键会被忽略，可以随便写注释。",
+    "注意 JSON 不支持注释语法，也不能有多余的逗号。"
+  ],
+
+  "DRY_RUN": true,
+
+  "LISTEN_GROUPS": [
+    "改成你的群名，必须一字不差"
+  ],
+  "MY_NICKNAME": "改成你的微信昵称",
+
+  "ONLY_REPLY_WHEN_AT_ME": false,
+  "SENDER_WHITELIST": [],
+  "SENDER_BLACKLIST": [],
+  "REPLY_WITH_AT": true,
+  "REPLY_AS_QUOTE": true,
+
+  "_关键词规则说明": "mode 可选 contains(包含) 或 exact(完全相等)；reply 里可以用 {sender} {group}",
+  "RULES": [
+    {
+      "keywords": ["在吗", "在不在", "有人吗"],
+      "reply": "在的 {sender}，有什么事你说～",
+      "mode": "contains"
+    },
+    {
+      "keywords": ["帮助", "help", "菜单"],
+      "reply": "发「指令」可以看我能干什么。",
+      "mode": "exact"
+    }
+  ],
+  "FALLBACK_REPLY": null,
+
+  "_AI说明": [
+    "providers 是按顺序降级的：第一个失败或被限流就自动切第二个。",
+    "推荐：主力放免费的智谱，备用放 DeepSeek。",
+    "preset 可选：zhipu / deepseek / qwen / kimi / doubao / baidu / custom",
+    "填好 api_key 后把 enabled 改成 true。",
+    "跑 python ai_provider.py 可以看各家对比和拿 key 的地址。"
+  ],
+  "AI": {
+    "enabled": false,
+    "providers": [
+      {
+        "preset": "zhipu",
+        "api_key": "",
+        "model": "glm-4.7-flash"
+      },
+      {
+        "preset": "deepseek",
+        "api_key": "",
+        "model": "deepseek-v4-flash"
+      }
+    ],
+    "system_prompt": "你是一个微信群里的助手机器人。回复要求：\n1. 简短，一般不超过两句话\n2. 语气自然口语化，像群友说话\n3. 不知道的事直接说不知道，绝对不要编造\n4. 不要用 markdown 格式，微信里显示不出来\n5. 涉及订单号、金额、库存这类具体数据，如果没有系统给你的真实数据，就让对方发对应的查询指令",
+    "memory_turns": 6,
+    "max_tokens": 300,
+    "temperature": 0.7,
+    "timeout": 20,
+    "max_input_chars": 1000,
+    "only_when_at_me": true,
+    "min_length": 2
+  },
+
+  "_后端说明": [
+    "http 模式：机器人调你后端的接口，后端去查库。推荐这个，数据库密码不用放在这台机器上。",
+    "mysql 模式：机器人直连数据库。不用后端配合，但密码要存本地。",
+    "两个可以同时开，也可以只开一个。",
+    "具体查什么怎么查，写在 handlers.py 里。",
+    "跑 python backend.py 可以测连通性。"
+  ],
+  "BACKEND": {
+    "http": {
+      "enabled": false,
+      "base_url": "https://your-backend.com",
+      "token": "",
+      "token_header": "Authorization",
+      "token_prefix": "Bearer ",
+      "headers": {},
+      "timeout": 10,
+      "retries": 2,
+      "health_path": "/api/health"
+    },
+    "mysql": {
+      "enabled": false,
+      "host": "127.0.0.1",
+      "port": 3306,
+      "user": "root",
+      "password": "",
+      "database": "",
+      "timeout": 10,
+      "_allow_write说明": "开了就意味着群里的人能通过发消息改你的数据库，想清楚再开。DELETE/DROP/TRUNCATE/ALTER 代码里已硬性禁止。",
+      "allow_write": false
+    },
+    "save_messages": {
+      "enabled": false,
+      "api_path": "/api/message/save"
+    }
+  },
+
+  "_防封号说明": "微信风控最敏感的是秒回+高频+复读机。这几项能调但不建议全关。",
+  "REPLY_DELAY_RANGE": [2.0, 5.0],
+  "PER_SENDER_COOLDOWN": 30,
+  "PER_GROUP_COOLDOWN": 5,
+  "MAX_REPLIES_PER_HOUR": 40,
+  "MAX_REPLY_LENGTH": 500,
+
+  "MESSAGE_LOG": "logs/messages.log",
+  "RUN_LOG": "logs/bot.log",
+  "PRINT_TO_CONSOLE": true
+}
