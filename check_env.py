@@ -339,10 +339,10 @@ def main():
         print("  1. 改 config.py（或 settings.json）里的 LISTEN_GROUPS 和 MY_NICKNAME")
         print("  2. 保持 DRY_RUN=True 跑一次 bot.py —— 只看不发，验证能读到消息")
         print("  3. 确认读得对了，再把 DRY_RUN 改成 False")
-        # print("\n  可选：")  # [FREE] 付费版工具
-        # print("    python ai_provider.py     看各家大模型对比和拿 key 的地址")  # [FREE] 付费版工具
-        # print("    python backend.py         测后端/数据库连通性")  # [FREE] 付费版工具
-        # print("    python handlers.py        看已注册的业务指令")  # [FREE] 付费版工具
+        print("\n  可选：")
+        print("    python ai_provider.py     看各家大模型对比和拿 key 的地址")
+        print("    python backend.py         测后端/数据库连通性")
+        print("    python handlers.py        看已注册的业务指令")
     else:
         print("[X] 环境还没通，按上面提示解决后重跑本脚本。")
     print()

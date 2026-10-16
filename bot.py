@@ -34,24 +34,9 @@ import itertools
 from collections import deque
 
 import config
-# [FREE] 业务指令 / AI / 系统对接属于付费版，免费版里这些模块不存在，按可选导入处理
-# import handlers
-# import ai_provider
-# import backend
-try:
-    import handlers
-except ImportError:
-    handlers = None
-try:
-    import ai_provider
-except ImportError:
-    ai_provider = None
-try:
-    import backend
-except ImportError:
-    backend = None
-
-FREE_MAX_RULES = 5  # [FREE] 免费版关键词规则上限
+import handlers
+import ai_provider
+import backend
 
 
 # ====================================================================
@@ -608,8 +593,7 @@ def match_rules(sender, content, group):
         return None
     lowered = text.lower()
 
-    # for rule in config.RULES:
-    for rule in config.RULES[:FREE_MAX_RULES]:  # [FREE] 免费版只生效前 5 条
+    for rule in config.RULES:
         mode = rule.get("mode", "contains")
         keywords = rule.get("keywords", [])
         if mode == "exact":
@@ -628,11 +612,9 @@ def build_reply(trace, sender, content, group, at_me):
     """返回 (回复文本 或 None, 命中的层)。"""
 
     # --- 第 1 层：业务指令（查库 / 调后端 / 写库）---
-    # result = handlers.route(sender, content, group, api=API, db=DB, store=STORE)
-    result = (handlers.route(sender, content, group, api=API, db=DB, store=STORE)
-              if handlers else None)  # [FREE]
+    result = handlers.route(sender, content, group, api=API, db=DB, store=STORE)
 
-    if handlers and isinstance(result, handlers.AIAnswer):
+    if isinstance(result, handlers.AIAnswer):
         # 查到真实数据了，让 AI 用人话组织一下
         if AI and AI.enabled:
             log.info(f"[{trace}] AI 请求：把业务数据组织成人话")
@@ -1018,25 +1000,15 @@ def _save(group, sender, content, mtype, attr, replied, reply_text):
 def _init_components():
     global AI, API, DB, STORE
 
-    # API, DB, STORE = backend.build(config.BACKEND)
-    # AI = ai_provider.build_engine(config.AI)
-    if backend:  # [FREE]
-        API, DB, STORE = backend.build(config.BACKEND)
-    if ai_provider:  # [FREE]
-        AI = ai_provider.build_engine(config.AI)
+    API, DB, STORE = backend.build(config.BACKEND)
+    AI = ai_provider.build_engine(config.AI)
 
     log.info("-" * 60)
     log.info(f"微信适配层: wxui（uiautomation {_uia_version()}）")
     log.info(f"Python    : {sys.version.split()[0]} @ {sys.executable}")
     log.info(f"代码文件  : {os.path.abspath(__file__)}")
     log.info(f"配置来源  : {'settings.json + config.py' if config.LOADED_FROM_JSON else 'config.py'}")
-    # log.info(f"业务指令  : 已注册 {len(handlers.HANDLERS)} 条")
-    if handlers:  # [FREE]
-        log.info(f"业务指令  : 已注册 {len(handlers.HANDLERS)} 条")
-    else:
-        log.info("版本      : 免费版（业务指令 / AI / 系统对接为付费版功能）")
-    if len(config.RULES) > FREE_MAX_RULES:  # [FREE]
-        log.warning(f"关键词规则共 {len(config.RULES)} 条，免费版只生效前 {FREE_MAX_RULES} 条")
+    log.info(f"业务指令  : 已注册 {len(handlers.HANDLERS)} 条")
 
     if AI and AI.enabled:
         names = " -> ".join(p.label for p in AI.providers)
